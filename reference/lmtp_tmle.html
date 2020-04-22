@@ -116,7 +116,8 @@
   <span class='no'>data</span>,
   <span class='no'>trt</span>,
   <span class='no'>outcome</span>,
-  <span class='no'>nodes</span>,
+  <span class='no'>nodes_trt</span>,
+  <span class='no'>nodes_outcome</span>,
   <span class='kw'>baseline</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>cens</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>Inf</span>,
@@ -144,9 +145,15 @@
       <td><p>The column name of the outcome variable.</p></td>
     </tr>
     <tr>
-      <th>nodes</th>
+      <th>nodes_trt</th>
       <td><p>A list of length tau with the column names for new nodes to
-be introduced at each time point. The list should be ordered following
+be introduced at each time point for treatment. The list should be ordered following
+the time ordering of the model.</p></td>
+    </tr>
+    <tr>
+      <th>nodes_outcome</th>
+      <td><p>A list of length tau with the column names for new nodes to
+be introduced at each time point for outcome. The list should be ordered following
 the time ordering of the model.</p></td>
     </tr>
     <tr>
