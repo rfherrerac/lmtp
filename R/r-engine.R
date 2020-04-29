@@ -29,7 +29,7 @@ estimate_r <- function(training, validation, trt, cens, C,
           "si", node_list[[t]], "binomial", "id"
         )
       pred_task <- suppressWarnings(initiate_sl3_task(valid_stck, "si", node_list[[t]], "binomial", "id"))
-      ensemble  <- initiate_ensemble("binomial", learners)
+      ensemble  <- initiate_ensemble("binomial", learners[[t]])
 
       # run SL
       fit <- run_ensemble(ensemble, fit_task)
@@ -78,7 +78,7 @@ estimate_c <- function(data, training, validation, C,
       # setup
       fit_task  <- suppressWarnings(initiate_sl3_task(training, C[[t]], node_list[[t]], "binomial", drop = TRUE))
       pred_task <- suppressWarnings(initiate_sl3_task(validation, C[[t]], node_list[[t]], "binomial", drop = TRUE))
-      ensemble  <- initiate_ensemble("binomial", learners)
+      ensemble  <- initiate_ensemble("binomial", learners[[t]])
 
       # run SL
       fit <- run_ensemble(ensemble, fit_task)

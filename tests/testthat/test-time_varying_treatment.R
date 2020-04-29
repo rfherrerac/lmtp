@@ -14,30 +14,32 @@ a <- c("A1", "A2")
 nodes <- list(c("L1"),
               c("L2"))
 truth <- 0.88
+lrnrs <- sl3::make_learner(sl3::Lrnr_glm)
+lrnrs <- list(lrnrs, lrnrs)
 
 # estimators
 sub <-
   lmtp_sub(df, a, "Y", nodes, k = 0, shift = function(x) x + 0.5,
-           outcome_type = "binomial", learners = sl3::make_learner(sl3::Lrnr_glm),
+           outcome_type = "binomial", learners = lrnrs,
            folds = 2)
 
 ipw <-
   lmtp_ipw(df, a, "Y", nodes, k = 0, shift = function(x) x + 0.5,
-           learners = sl3::make_learner(sl3::Lrnr_glm),
+           learners = lrnrs,
            folds = 2)
 
 tmle <-
   lmtp_tmle(df, a, "Y", nodes, cens = NULL, k = 0, shift = function(x) x + 0.5,
             outcome_type = "binomial",
-            learners_outcome = sl3::make_learner(sl3::Lrnr_glm),
-            learners_trt = sl3::make_learner(sl3::Lrnr_glm),
+            learners_outcome = lrnrs,
+            learners_trt = lrnrs,
             folds = 2)
 
 sdr <-
   lmtp_sdr(df, a, "Y", nodes, cens = NULL, k = 0, shift = function(x) x + 0.5,
            outcome_type = "binomial",
-           learners_outcome = sl3::make_learner(sl3::Lrnr_glm),
-           learners_trt = sl3::make_learner(sl3::Lrnr_glm),
+           learners_outcome = lrnrs,
+           learners_trt = lrnrs,
            folds = 2)
 
 # tests
