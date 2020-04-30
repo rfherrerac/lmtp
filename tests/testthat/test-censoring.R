@@ -28,7 +28,6 @@ tmle <-
             learners_outcome = lrnrs,
             learners_trt = lrnrs,
             folds = 2, progress_bar = FALSE)
-
 sdr <-
   lmtp_sdr(sim_cens, a, "Y", nodes, baseline = NULL,
            cens, k = 0, shift = function(x) x + 0.5,
