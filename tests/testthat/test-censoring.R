@@ -9,32 +9,33 @@ lrnrs <- sl3::make_learner(sl3::Lrnr_glm)
 lrnrs <- list(lrnrs, lrnrs)
 
 sub <-
-  lmtp_sub(sim_cens, a, "Y", nodes, baseline = NULL,
-           cens, k = 1, shift = function(x) x + 0.5,
-           outcome_type = "binomial",
-           learners = lrnrs,
-           folds = 2, progress_bar = FALSE)
+    lmtp_sub(sim_cens, a, "Y", nodes, baseline = NULL,
+             cens, k = 1, shift = function(x) x + 0.5,
+             outcome_type = "binomial",
+             learners = sl3::make_learner(sl3::Lrnr_glm),
+             folds = 2)
 
 ipw <-
   lmtp_ipw(sim_cens, a, "Y", nodes, baseline = NULL,
            cens, k = 0, shift = function(x) x + 0.5,
-           learners = lrnrs,
-           folds = 2, progress_bar = FALSE)
+           learners = sl3::make_learner(sl3::Lrnr_glm),
+           folds = 2)
 
 tmle <-
-  lmtp_tmle(sim_cens, a, "Y", nodes, baseline = NULL,
-            cens, k = 0, shift = function(x) x + 0.5,
-            outcome_type = "binomial",
-            learners_outcome = lrnrs,
-            learners_trt = lrnrs,
-            folds = 2, progress_bar = FALSE)
+    lmtp_tmle(sim_cens, a, "Y", nodes, baseline = NULL,
+              cens, k = 0, shift = function(x) x + 0.5,
+              outcome_type = "binomial",
+              learners_outcome = sl3::make_learner(sl3::Lrnr_glm),
+              learners_trt = sl3::make_learner(sl3::Lrnr_glm),
+              folds = 2)
+
 sdr <-
   lmtp_sdr(sim_cens, a, "Y", nodes, baseline = NULL,
            cens, k = 0, shift = function(x) x + 0.5,
            outcome_type = "binomial",
-           learners_outcome = lrnrs,
-           learners_trt = lrnrs,
-           folds = 2, progress_bar = FALSE)
+           learners_outcome = sl3::make_learner(sl3::Lrnr_glm),
+           learners_trt = sl3::make_learner(sl3::Lrnr_glm),
+           folds = 2)
 
 # tests
 test_that("estimator fidelity with censoring", {
