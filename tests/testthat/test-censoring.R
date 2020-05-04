@@ -12,29 +12,29 @@ sub <-
     lmtp_sub(sim_cens, a, "Y", nodes, baseline = NULL,
              cens, k = 1, shift = function(x) x + 0.5,
              outcome_type = "binomial",
-             learners = sl3::make_learner(sl3::Lrnr_glm),
+             learners = lrnrs,
              folds = 2)
 
 ipw <-
   lmtp_ipw(sim_cens, a, "Y", nodes, baseline = NULL,
            cens, k = 0, shift = function(x) x + 0.5,
-           learners = sl3::make_learner(sl3::Lrnr_glm),
+           learners = lrnrs,
            folds = 2)
 
 tmle <-
     lmtp_tmle(sim_cens, a, "Y", nodes, baseline = NULL,
               cens, k = 0, shift = function(x) x + 0.5,
               outcome_type = "binomial",
-              learners_outcome = sl3::make_learner(sl3::Lrnr_glm),
-              learners_trt = sl3::make_learner(sl3::Lrnr_glm),
+              learners_outcome = lrnrs,
+              learners_trt = lrnrs,
               folds = 2)
 
 sdr <-
   lmtp_sdr(sim_cens, a, "Y", nodes, baseline = NULL,
            cens, k = 0, shift = function(x) x + 0.5,
            outcome_type = "binomial",
-           learners_outcome = sl3::make_learner(sl3::Lrnr_glm),
-           learners_trt = sl3::make_learner(sl3::Lrnr_glm),
+           learners_outcome = lrnrs,
+           learners_trt = lrnrs,
            folds = 2)
 
 # tests
