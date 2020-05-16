@@ -277,6 +277,21 @@ will be bounded by. The default is 1e-5, bounding predictions by 1e-5 and 0.9999
                       <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>folds</span> <span class='kw'>=</span> <span class='fl'>2</span>)
 })
 <span class='no'>fit2.2</span></div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>LMTP Estimator</span><span>: TMLE</span></div><div class='output co'>#&gt;    </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>Trt. Policy</span><span>: </span><span style='color: #0000BB;font-style: italic;'>(d)</span><span></span></div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>Population intervention effect</span><span></span></div><div class='output co'>#&gt;       </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>Estimate</span><span>: 0.2632</span></div><div class='output co'>#&gt;     </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>Std. error</span><span>: 0.0168</span></div><div class='output co'>#&gt;         </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>95% CI</span><span>: (0.2303, 0.2962)</span></div><div class='output co'>#&gt; </div><div class='input'>
+<span class='co'># Example 3.1</span>
+<span class='co'># Longitudinal setting, time-varying binary treatment, time-varying covariates</span>
+<span class='co'># and baseline covariates with no loss-to-follow-up. Interested in a traditional</span>
+<span class='co'># causal effect where treatment is set to 1 at all time points for all observations.</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='st'>"iptwExWide"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"twang"</span>)
+<span class='no'>a</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span>(<span class='st'>"tx"</span>, <span class='fl'>1</span>:<span class='fl'>3</span>)
+<span class='no'>baseline</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"gender"</span>, <span class='st'>"age"</span>)
+<span class='no'>nodes</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"use0"</span>), <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"use1"</span>), <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"use2"</span>))
+<span class='kw pkg'>progressr</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/progressr/man/with_progress.html'>with_progress</a></span>({
+  <span class='no'>fit3.1</span> <span class='kw'>&lt;-</span>
+    <span class='fu'><a href='lmtp_tmle.html'>lmtp_tmle</a></span>(<span class='no'>iptwExWide</span>, <span class='no'>a</span>, <span class='st'>"outcome"</span>, <span class='no'>nodes</span>, <span class='kw'>baseline</span> <span class='kw'>=</span> <span class='no'>baseline</span>,
+              <span class='kw'>shift</span> <span class='kw'>=</span> <span class='kw'>function</span>(<span class='no'>x</span>) <span class='fl'>1</span>, <span class='kw'>outcome_type</span> <span class='kw'>=</span> <span class='st'>"continuous"</span>,
+              <span class='kw'>folds</span> <span class='kw'>=</span> <span class='fl'>2</span>)
+})</div><div class='output co'>#&gt; <span class='error'>Error: Non-Markov process, set `baseline = NULL` and add baseline covariates to `nodes[[1]]`</span></div><div class='input'><span class='no'>fit3.1</span></div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'fit3.1' not found</span></div><div class='input'>
+
 
 </div></span></pre>
   </div>
