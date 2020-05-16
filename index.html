@@ -12,7 +12,13 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
 <script src="pkgdown.js"></script><meta property="og:title" content="Non-parametric Causal Effects Based on Longitudinal Modified Treatment Policies">
-<meta property="og:description" content="TO DO.">
+<meta property="og:description" content="Cross-validated estimators for casual effects based on longitudinal modified treatment 
+  policies as described in ... (2020) &lt;arXiv:...&gt;, traditional point treatment, 
+  and traditional longitudinal effects. Both continuous and binary treatments are allowed as well are 
+  censored outcomes. The treatment mechanism is estimated via a density ratio classification procedure 
+  whether treatment is continuous or binary. Estimation is performed using the Super Learner from `sl3`. 
+  For both continuous and binary outcomes, additive treatment effects can be calculated and relative 
+  risks and odds ratios may be calculated for binary outcomes. ">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -31,7 +37,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">lmtp</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.3.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.8.9000</span>
       </span>
     </div>
 
@@ -46,6 +52,18 @@
 <li>
   <a href="reference/index.html">Reference</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+<li>
+      <a href="articles/intro-lmtp.html">Using LMTP</a>
+    </li>
+  </ul>
+</li>
       </ul>
 <ul class="nav navbar-nav navbar-right"></ul>
 </div>
@@ -59,38 +77,164 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-
-<div id="lmtp" class="section level1">
+<div id="lmtp-" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
-<a href="#lmtp" class="anchor"></a>lmtp</h1></div>
+<a href="#lmtp-" class="anchor"></a>lmtp <img src="reference/figures/lmtp.png" align="right" height="139">
+</h1></div>
 <!-- badges: start -->
 
 <blockquote>
-<p>Non-parametric Causal Effects Based on Longitudinal Modified Treatment Policies</p>
+<p>Cross-Validated, Non-parametric Causal Effects Based on Longitudinal Modified Treatment Policies</p>
 </blockquote>
-</div>
-<div id="installation" class="section level1">
-<h1 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h1>
-<p>The development version can be installed from GitHub with:</p>
+<p><a href="https://nicholastwilliams.com">Nick Williams</a> and <a href="https://idiaz.xyz">Ivan Diaz</a></p>
+<hr>
+<div id="installation" class="section level2">
+<h2 class="hasAnchor">
+<a href="#installation" class="anchor"></a>Installation</h2>
+<p><code>lmtp</code> can be installed from GitHub with:</p>
 <div class="sourceCode" id="cb1"><pre class="r"><span class="kw pkg">devtools</span><span class="kw ns">::</span><span class="fu">install_github</span>(<span class="st">"nt-williams/lmtp"</span>)</pre></div>
 </div>
-<div id="example" class="section level1">
-<h1 class="hasAnchor">
-<a href="#example" class="anchor"></a>Example</h1>
-<p>We have a data set with treatment nodes at 4 time points and a binary outcome at time 5.</p>
-<div class="sourceCode" id="cb2"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="kw pkg">lmtp</span><span class="kw ns">::</span><span class="no"><a href="reference/sim_t4.html">sim_t4</a></span>)
-<span class="co">#&gt;   ID L_1 A_1 L_2 A_2 L_3 A_3 L_4 A_4 Y</span>
-<span class="co">#&gt; 1  1   2   1   0   1   1   3   1   2 0</span>
-<span class="co">#&gt; 2  2   2   3   1   3   1   3   1   4 1</span>
-<span class="co">#&gt; 3  3   3   2   1   2   1   2   0   3 0</span>
-<span class="co">#&gt; 4  4   1   0   0   4   1   1   1   4 1</span>
-<span class="co">#&gt; 5  5   3   2   1   3   1   3   1   3 0</span>
-<span class="co">#&gt; 6  6   3   4   0   2   1   3   1   0 0</span></pre></div>
-<p>We’re interested in the effect of an intervention on outcome <code>Y</code> where treatment is decreased by 1 at all time points for observations whose treatment value won’t go below 0 if intervened upon. The true value under this intervention is about 0.48.</p>
-<p><img src="https://gist.githubusercontent.com/nt-williams/2488fef9e94c7ef1a3920c2682433980/raw/2a339c10d651aa18dc48188b4017c605c30e2405/lmtp-readme-example.svg?sanitize=true"></p>
+<div id="scope" class="section level2">
+<h2 class="hasAnchor">
+<a href="#scope" class="anchor"></a>Scope</h2>
+<p><code>lmtp</code> is an R package that provides an estimation framework for the casual effects of longitudinal modified treatment policies (also referred to as stochastic interventions) as described in Diaz, Williams, &amp; Hoffman (2020). Two primary estimators are supported, a targeted maximum likelihood (TML) estimator and a sequentially doubly robust (SDR) estimator (a substitution and an IPW estimator are provided for the sake of being thorough but their use is recommended against in favor of the TML and SDR estimators). In addition to longitudinal effects, point treatments are naturally supported and both binary and continuous outcome (both with censoring) are allowed. <code>lmtp</code> is built atop the <a href="https://github.com/tlverse/sl3"><code>sl3</code></a> package to utilize ensemble machine learning for estimation.</p>
+<p>For an in-depth look at the package’s functionality, please consult the accompying <a href="https://htmlpreview.github.io/?https://github.com/nt-williams/lmtp/blob/master/vignettes/intro-lmtp.html">vignette</a>.</p>
+<div id="features" class="section level3">
+<h3 class="hasAnchor">
+<a href="#features" class="anchor"></a>Features</h3>
+<table class="table">
+<thead><tr class="header">
+<th>Feature</th>
+<th align="center">Status</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Point treatment</td>
+<td align="center">✓</td>
+</tr>
+<tr class="even">
+<td>Longitudinal treatment</td>
+<td align="center">✓</td>
+</tr>
+<tr class="odd">
+<td>Modified treatment intervention</td>
+<td align="center">✓</td>
+</tr>
+<tr class="even">
+<td>Static intervention</td>
+<td align="center">✓</td>
+</tr>
+<tr class="odd">
+<td>Dynamic intervention</td>
+<td align="center">Planned</td>
+</tr>
+<tr class="even">
+<td>Continuous treatment</td>
+<td align="center">✓</td>
+</tr>
+<tr class="odd">
+<td>Binary treatment</td>
+<td align="center">✓</td>
+</tr>
+<tr class="even">
+<td>Missingness in treatment</td>
+<td align="center"></td>
+</tr>
+<tr class="odd">
+<td>Continuous outcome</td>
+<td align="center">✓</td>
+</tr>
+<tr class="even">
+<td>Binary outcome</td>
+<td align="center">✓</td>
+</tr>
+<tr class="odd">
+<td>Censored outcome</td>
+<td align="center">✓</td>
+</tr>
+<tr class="even">
+<td>Mediation</td>
+<td align="center"></td>
+</tr>
+<tr class="odd">
+<td>Super learner</td>
+<td align="center">✓</td>
+</tr>
+<tr class="even">
+<td>Clustered data</td>
+<td align="center">Planned</td>
+</tr>
+<tr class="odd">
+<td>Parallel processing</td>
+<td align="center">✓</td>
+</tr>
+<tr class="even">
+<td>Progress bars</td>
+<td align="center">✓</td>
+</tr>
+</tbody>
+</table>
 </div>
+</div>
+<div id="example" class="section level2">
+<h2 class="hasAnchor">
+<a href="#example" class="anchor"></a>Example</h2>
+<div class="sourceCode" id="cb2"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">lmtp</span>)
+<span class="co">#&gt; lmtp: Causal Effects Based on Longitudinal Modified Treatment Policies</span>
+<span class="co">#&gt; Version: 0.0.8.9000</span>
+<span class="co">#&gt; </span>
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">sl3</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">future</span>)
 
+<span class="co"># the data: 4 treatment nodes with time varying covariates and a binary outcome</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">sim_t4</span>)
+<span class="co">#&gt;   ID L_1 A_1 L_2 A_2 L_3 A_3 L_4 A_4 Y</span>
+<span class="co">#&gt; 1  1   2   3   0   1   1   1   1   3 0</span>
+<span class="co">#&gt; 2  2   2   1   1   4   0   3   1   2 0</span>
+<span class="co">#&gt; 3  3   1   0   1   3   1   2   1   1 1</span>
+<span class="co">#&gt; 4  4   1   0   0   3   1   3   1   2 0</span>
+<span class="co">#&gt; 5  5   3   3   1   1   0   1   1   2 0</span>
+<span class="co">#&gt; 6  6   1   0   0   2   0   3   1   4 0</span></pre></div>
+<p>We’re interested in a treatment policy, <code>d</code>, where exposure is decreased by 1 only among subjects whose exposure won’t go below 1 if intervened upon. The true population outcome under this policy is about 0.305.</p>
+<div class="sourceCode" id="cb3"><pre class="r"><span class="co"># our treatment policy function to be applied at all time points</span>
+<span class="no">d</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">a</span>) {
+  (<span class="no">a</span> - <span class="fl">1</span>) * (<span class="no">a</span> - <span class="fl">1</span> <span class="kw">&gt;=</span> <span class="fl">1</span>) + <span class="no">a</span> * (<span class="no">a</span> - <span class="fl">1</span> <span class="kw">&lt;</span> <span class="fl">1</span>)
+}</pre></div>
+<p>In addition to specifying a treatment policy, we need to specify our treatment variables, time-varying covariates, and the <code>sl3</code> learners to be used in estimation.</p>
+<div class="sourceCode" id="cb4"><pre class="r"><span class="co"># our treatment nodes, a character vector of length 4</span>
+<span class="no">a</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"A_1"</span>, <span class="st">"A_2"</span>, <span class="st">"A_3"</span>, <span class="st">"A_4"</span>)
+<span class="co"># our time varying nodes, a list of length 4</span>
+<span class="no">time_varying</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"L_1"</span>), <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"L_2"</span>), <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"L_3"</span>), <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"L_4"</span>))
+<span class="co"># our sl3 learner stack: the mean, GLM, and random forest</span>
+<span class="no">lrnrs</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://tlverse.org/sl3/reference/make_learner_stack.html">make_learner_stack</a></span>(<span class="no">Lrnr_mean</span>,
+                            <span class="no">Lrnr_glm</span>,
+                            <span class="no">Lrnr_ranger</span>)</pre></div>
+<p>We can now estimate the effect of our treatment policy, <code>d</code>. In this example, we’ll use the cross-validated TML estimator with 10 folds. To speed up computation, we can use parallel processing supported by the <code>future</code> package.</p>
+<div class="sourceCode" id="cb5"><pre class="r"><span class="fu"><a href="https://rdrr.io/pkg/future/man/plan.html">plan</a></span>(<span class="no">multiprocess</span>)
+
+<span class="fu"><a href="reference/lmtp_tmle.html">lmtp_tmle</a></span>(<span class="no">sim_t4</span>, <span class="no">a</span>, <span class="st">"Y"</span>, <span class="no">time_varying</span>, <span class="kw">k</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">shift</span> <span class="kw">=</span> <span class="no">d</span>,
+          <span class="kw">learners_outcome</span> <span class="kw">=</span> <span class="no">lrnrs</span>, <span class="kw">learners_trt</span> <span class="kw">=</span> <span class="no">lrnrs</span>, <span class="kw">folds</span> <span class="kw">=</span> <span class="fl">10</span>)
+<span class="co">#&gt; LMTP Estimator: TMLE</span>
+<span class="co">#&gt;    Trt. Policy: (d)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Population intervention effect</span>
+<span class="co">#&gt;       Estimate: 0.3089</span>
+<span class="co">#&gt;     Std. error: 0.0115</span>
+<span class="co">#&gt;         95% CI: (0.2863, 0.3315)</span></pre></div>
+</div>
+<div id="citation" class="section level2">
+<h2 class="hasAnchor">
+<a href="#citation" class="anchor"></a>Citation</h2>
+<div class="sourceCode" id="cb6"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># Package citation</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a></span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="co"># Paper citation</span></span></code></pre></div>
+</div>
+<div id="references" class="section level2">
+<h2 class="hasAnchor">
+<a href="#references" class="anchor"></a>References</h2>
+<p>Ivan Diaz, Nicholas Williams, &amp; Katherine Hoffman, 2020. <em>Non-Parametric Causal Effects Based on Longitudinal Modified Policies</em>.</p>
+</div>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -104,7 +248,7 @@
 <div class="developers">
 <h2>Developers</h2>
 <ul class="list-unstyled">
-<li>Nicholas Williams <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-1378-4831" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Nicholas Williams <br><small class="roles"> Author, maintainer, copyright holder </small> <a href="https://orcid.org/0000-0002-1378-4831" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 <li>Iván Díaz <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0001-9056-2047" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 </ul>
 </div>
@@ -114,7 +258,7 @@
 <ul class="list-unstyled">
 <li><a href="https://travis-ci.com/nt-williams/lmtp"><img src="https://travis-ci.com/nt-williams/lmtp.svg?token=DA4a53nWMx6q9LisKdRD&amp;branch=master" alt="Build Status"></a></li>
 <li><a href="https://codecov.io/gh/nt-williams/lmtp"><img src="https://codecov.io/gh/nt-williams/lmtp/branch/master/graph/badge.svg?token=TFQNTischL" alt="codecov"></a></li>
-<li><a href="https://github.com/nt-williams/lmtp/actions"><img src="https://github.com/nt-williams/lmtp/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
+<li><a href="http://opensource.org/licenses/MIT"><img src="http://img.shields.io/badge/license-MIT-brightgreen.svg" alt="MIT license"></a></li>
 </ul>
 </div>
 </div>

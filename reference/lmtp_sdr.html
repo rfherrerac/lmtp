@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">lmtp</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.3.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.8.9000</span>
       </span>
     </div>
 
@@ -86,6 +86,18 @@
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/intro-lmtp.html">Using LMTP</a>
+    </li>
+  </ul>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -125,7 +137,8 @@
   <span class='kw'>bounds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>learners_outcome</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>learners_trt</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>progress_bar</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+  <span class='kw'>folds</span> <span class='kw'>=</span> <span class='fl'>10</span>,
+  <span class='kw'>bound</span> <span class='kw'>=</span> <span class='fl'>1e-05</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -191,8 +204,13 @@ regression.</p></td>
 mechanism.</p></td>
     </tr>
     <tr>
-      <th>progress_bar</th>
-      <td><p>Should a progress bar be displayed? Default is <code>TRUE</code>.</p></td>
+      <th>folds</th>
+      <td><p>The number of folds to be used for cross-validation.</p></td>
+    </tr>
+    <tr>
+      <th>bound</th>
+      <td><p>Determines that maximum and minimum values (scaled) predictions
+will be bounded by. The default is 1e-5, bounding predictions by 1e-5 and 0.9999.</p></td>
     </tr>
     </table>
 
@@ -201,8 +219,66 @@ mechanism.</p></td>
     <p>TODO</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'># TO DO
-</div></pre>
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>lmtp</span>)
+<span class='co'># Example 1.1</span>
+<span class='co'># Point treatment, continuous exposure, continuous outcome, no loss-to-follow-up</span>
+<span class='co'># Interested in the effect of a population wide decrease in A of 5 units</span>
+<span class='co'># The true value under this intervention is about 519.</span>
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>56</span>)
+<span class='no'>n</span> <span class='kw'>&lt;-</span> <span class='fl'>1000</span>
+<span class='no'>W</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='no'>n</span>, <span class='fl'>10</span>, <span class='fl'>5</span>)
+<span class='no'>A</span> <span class='kw'>&lt;-</span> <span class='fl'>23</span> + <span class='fl'>5</span>*<span class='no'>W</span> + <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='no'>n</span>)
+<span class='no'>Y</span> <span class='kw'>&lt;-</span> <span class='fl'>7.2</span>*<span class='no'>A</span> + <span class='fl'>3</span>*<span class='no'>W</span> + <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='no'>n</span>)
+<span class='no'>ex1_dat</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(<span class='no'>W</span>, <span class='no'>A</span>, <span class='no'>Y</span>)
+<span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>x</span>) <span class='no'>x</span> - <span class='fl'>5</span>
+<span class='no'>fit1.1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='lmtp_tmle.html'>lmtp_tmle</a></span>(<span class='no'>ex1_dat</span>, <span class='st'>"A"</span>, <span class='st'>"Y"</span>, <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"W"</span>)), <span class='kw'>shift</span> <span class='kw'>=</span> <span class='no'>d</span>,
+                    <span class='kw'>outcome_type</span> <span class='kw'>=</span> <span class='st'>"continuous"</span>, <span class='kw'>folds</span> <span class='kw'>=</span> <span class='fl'>2</span>)
+
+<span class='co'># Example 1.2</span>
+<span class='co'># Point treatment, continuous exposure, continuous outcome, no loss-to-follow-up</span>
+<span class='co'># Interesed in the effect of a modified treatment policy where A is decreased by 15</span>
+<span class='co'># units only among observations whose observed A was above 80.</span>
+<span class='co'># The true value under this intervention is about 513.</span>
+<span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>x</span>) (<span class='no'>x</span> <span class='kw'>&gt;</span> <span class='fl'>80</span>)*(<span class='no'>x</span> - <span class='fl'>15</span>) + (<span class='no'>x</span> <span class='kw'>&lt;=</span> <span class='fl'>80</span>)*<span class='no'>x</span>
+<span class='no'>fit1.2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='lmtp_tmle.html'>lmtp_tmle</a></span>(<span class='no'>ex1_dat</span>, <span class='st'>"A"</span>, <span class='st'>"Y"</span>, <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"W"</span>)), <span class='kw'>shift</span> <span class='kw'>=</span> <span class='no'>d</span>,
+                    <span class='kw'>outcome_type</span> <span class='kw'>=</span> <span class='st'>"continuous"</span>, <span class='kw'>folds</span> <span class='kw'>=</span> <span class='fl'>2</span>)
+<span class='no'>fit1.2</span></div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='message'><span style='font-weight: bold;'>LMTP Estimator</span><span>: TMLE</span></div><div class='output co'>#&gt;    </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>Trt. Policy</span><span>: </span><span style='color: #0000BB;font-style: italic;'>(d)</span><span></span></div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>Population intervention effect</span><span></span></div><div class='output co'>#&gt;       </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>Estimate</span><span>: 507.768</span></div><div class='output co'>#&gt;     </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>Std. error</span><span>: 4.8914</span></div><div class='output co'>#&gt;         </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>95% CI</span><span>: (498.1811, 517.3549)</span></div><div class='output co'>#&gt; </div><div class='input'>
+<span class='co'># Example 2.1</span>
+<span class='co'># Longitudinal setting, time-varying continuous exposure bounded by 0,</span>
+<span class='co'># time-varying covariates, and a binary outcome with no loss-to-follow-up.</span>
+<span class='co'># Interested in the effect of a treatment policy where exposure decreases by</span>
+<span class='co'># one unit at every time point if an observations observed exposure is greater</span>
+<span class='co'># than or equal to 2. The true value under this intervention is about 0.305.</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>sim_t4</span>)</div><div class='output co'>#&gt;   ID L_1 A_1 L_2 A_2 L_3 A_3 L_4 A_4 Y
+#&gt; 1  1   2   3   0   1   1   1   1   3 0
+#&gt; 2  2   2   1   1   4   0   3   1   2 0
+#&gt; 3  3   1   0   1   3   1   2   1   1 1
+#&gt; 4  4   1   0   0   3   1   3   1   2 0
+#&gt; 5  5   3   3   1   1   0   1   1   2 0
+#&gt; 6  6   1   0   0   2   0   3   1   4 0</div><div class='input'><span class='co'># specifying treament variables</span>
+<span class='no'>a</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"A_1"</span>, <span class='st'>"A_2"</span>, <span class='st'>"A_3"</span>, <span class='st'>"A_4"</span>)
+<span class='co'># specifying time varying covariates</span>
+<span class='no'>time_varying</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"L_1"</span>), <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"L_2"</span>), <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"L_3"</span>), <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"L_4"</span>))
+<span class='co'># treatment policy function to be applied at all time points</span>
+<span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>a</span>) {
+  (<span class='no'>a</span> - <span class='fl'>1</span>) * (<span class='no'>a</span> - <span class='fl'>1</span> <span class='kw'>&gt;=</span> <span class='fl'>1</span>) + <span class='no'>a</span> * (<span class='no'>a</span> - <span class='fl'>1</span> <span class='kw'>&lt;</span> <span class='fl'>1</span>)
+}
+<span class='kw pkg'>progressr</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/progressr/man/with_progress.html'>with_progress</a></span>({
+  <span class='no'>fit2.1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='lmtp_tmle.html'>lmtp_tmle</a></span>(<span class='no'>sim_t4</span>, <span class='no'>a</span>, <span class='st'>"Y"</span>, <span class='no'>time_varying</span>, <span class='kw'>shift</span> <span class='kw'>=</span> <span class='no'>d</span>, <span class='kw'>folds</span> <span class='kw'>=</span> <span class='fl'>2</span>)
+})
+<span class='no'>fit2.1</span></div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>LMTP Estimator</span><span>: TMLE</span></div><div class='output co'>#&gt;    </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>Trt. Policy</span><span>: </span><span style='color: #0000BB;font-style: italic;'>(d)</span><span></span></div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>Population intervention effect</span><span></span></div><div class='output co'>#&gt;       </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>Estimate</span><span>: 0.2644</span></div><div class='output co'>#&gt;     </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>Std. error</span><span>: 0.017</span></div><div class='output co'>#&gt;         </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>95% CI</span><span>: (0.2311, 0.2976)</span></div><div class='output co'>#&gt; </div><div class='input'>
+<span class='co'># Example 2.2</span>
+<span class='co'># Example 2.1 assumed that the outcome (as well as the treatment variables)</span>
+<span class='co'># were directly affected by all other nodes in the past. In certain situtations,</span>
+<span class='co'># domain specific knowledge may suggest otherwise leading to a Markov processes.</span>
+<span class='co'># This can be controlled using the k argument.</span>
+<span class='kw pkg'>progressr</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/progressr/man/with_progress.html'>with_progress</a></span>({
+  <span class='no'>fit2.2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='lmtp_tmle.html'>lmtp_tmle</a></span>(<span class='no'>sim_t4</span>, <span class='no'>a</span>, <span class='st'>"Y"</span>, <span class='no'>time_varying</span>, <span class='kw'>shift</span> <span class='kw'>=</span> <span class='no'>d</span>,
+                      <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>folds</span> <span class='kw'>=</span> <span class='fl'>2</span>)
+})
+<span class='no'>fit2.2</span></div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>LMTP Estimator</span><span>: TMLE</span></div><div class='output co'>#&gt;    </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>Trt. Policy</span><span>: </span><span style='color: #0000BB;font-style: italic;'>(d)</span><span></span></div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>Population intervention effect</span><span></span></div><div class='output co'>#&gt;       </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>Estimate</span><span>: 0.2632</span></div><div class='output co'>#&gt;     </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>Std. error</span><span>: 0.0168</span></div><div class='output co'>#&gt;         </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>95% CI</span><span>: (0.2303, 0.2962)</span></div><div class='output co'>#&gt; </div><div class='input'>
+
+</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

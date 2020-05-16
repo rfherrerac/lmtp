@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Tidy a(n) lmtp object — tidy.lmtp • lmtp</title>
+<title>Time To Event Last Outcome Carried Forward — event_locf • lmtp</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Tidy a(n) lmtp object — tidy.lmtp" />
-<meta property="og:description" content="Tidy a(n) lmtp object" />
+<meta property="og:title" content="Time To Event Last Outcome Carried Forward — event_locf" />
+<meta property="og:description" content="Time To Event Last Outcome Carried Forward" />
 
 
 
@@ -115,37 +115,35 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Tidy a(n) lmtp object</h1>
+    <h1>Time To Event Last Outcome Carried Forward</h1>
     
-    <div class="hidden name"><code>tidy.lmtp.Rd</code></div>
+    <div class="hidden name"><code>event_locf.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Tidy a(n) lmtp object</p>
+    <p>Time To Event Last Outcome Carried Forward</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for lmtp</span>
-<span class='fu'><a href='https://rdrr.io/pkg/generics/man/tidy.html'>tidy</a></span>(<span class='no'>x</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>event_locf</span>(<span class='no'>data</span>, <span class='no'>outcomes</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>x</th>
-      <td><p>A <code>lmtp</code> object produced by a call to <code><a href='lmtp_tmle.html'>lmtp::lmtp_tmle()</a></code>, <code><a href='lmtp_sdr.html'>lmtp::lmtp_sdr()</a></code>,
-<code><a href='lmtp_sub.html'>lmtp::lmtp_sub()</a></code>, or <code><a href='lmtp_ipw.html'>lmtp::lmtp_ipw()</a></code>.</p></td>
+      <th>data</th>
+      <td><p>The dataset to modify.</p></td>
     </tr>
     <tr>
-      <th>...</th>
-      <td><p>Unused, included for generic consistency only.</p></td>
+      <th>outcomes</th>
+      <td><p>A vector of outcome nodes ordered by time.</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'># TODO
+    <p>A modified dataset with future outcome nodes set to 1 if an observation
+experienced an event at any previous time point.</p>
 
-</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
