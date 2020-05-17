@@ -90,7 +90,7 @@
 
 }
 </style>
-<p><strong>Authors</strong>: <a href="https://nicholastwilliams.com">Nick Williams</a> and <a href="https://idiaz.xyz">Ivan Diaz</a><br><strong>Updated</strong>: 2020-05-16</p>
+<p><strong>Authors</strong>: <a href="https://nicholastwilliams.com">Nick Williams</a> and <a href="https://idiaz.xyz">Ivan Diaz</a><br><strong>Updated</strong>: 2020-05-17</p>
 <p>This document serves as an introductory guide to using the <code>lmtp</code> package. <code>lmtp</code> provides an estimation framework for the casual effects of longitudinal modified treatment policies of continuous valued exposures using ensemble machine learning. While primarily developed to estimate the effect of continuous exposures, <code>lmtp</code> naturally extends to allowing the estimation of traditional causal effects based on binary exposure in both point treatment and time-varying situations.</p>
 <p>While not possible to cover everything, this document should equip users of <code>lmtp</code> with enough knowledge to complete the majority of use cases.</p>
 <div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">lmtp</span>)
@@ -557,7 +557,7 @@ d_t(a_t, h_t)=\left\{ \begin{array}{l}
 <span class="co">#&gt; # A tibble: 1 x 5</span>
 <span class="co">#&gt;   estimator estimate std.error conf.low conf.high</span>
 <span class="co">#&gt;   &lt;chr&gt;        &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 TMLE         0.258    0.0170    0.225     0.292</span></pre></body></html></div>
+<span class="co">#&gt; 1 TMLE         0.259    0.0176    0.224     0.293</span></pre></body></html></div>
 </div>
 <div id="parallel-processing-with-future" class="section level3">
 <h3 class="hasAnchor">
