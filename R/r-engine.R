@@ -60,15 +60,15 @@ ratio_dr <- function(ratios, V) {
   out <- list()
   for (i in 1:V) {
       out[[i]] <- list()
-      out[[i]]$train <- check_extreme_ratio(
+      out[[i]]$train <- 
         matrix(t(apply(ratios[[i]]$train$natural, 1, cumprod)),
                nrow = nrow(ratios[[i]]$train$natural),
-               ncol = ncol(ratios[[i]]$train$natural), 1)
+               ncol = ncol(ratios[[i]]$train$natural)
       )
-      out[[i]]$valid <- check_extreme_ratio(
+      out[[i]]$valid <- 
         matrix(t(apply(ratios[[i]]$valid$natural, 1, cumprod)),
                nrow = nrow(ratios[[i]]$valid$natural),
-               ncol = ncol(ratios[[i]]$valid$natural), 1)
+               ncol = ncol(ratios[[i]]$valid$natural)
       )
       out[[i]]$sl_weights <- ratios[[i]]$sl_weights
   }
