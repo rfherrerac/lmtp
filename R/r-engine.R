@@ -63,12 +63,12 @@ ratio_dr <- function(ratios, V) {
       out[[i]]$train <- check_extreme_ratio(
         matrix(t(apply(ratios[[i]]$train$natural, 1, cumprod)),
                nrow = nrow(ratios[[i]]$train$natural),
-               ncol = ncol(ratios[[i]]$train$natural))
+               ncol = ncol(ratios[[i]]$train$natural), 1)
       )
       out[[i]]$valid <- check_extreme_ratio(
         matrix(t(apply(ratios[[i]]$valid$natural, 1, cumprod)),
                nrow = nrow(ratios[[i]]$valid$natural),
-               ncol = ncol(ratios[[i]]$valid$natural))
+               ncol = ncol(ratios[[i]]$valid$natural), 1)
       )
       out[[i]]$sl_weights <- ratios[[i]]$sl_weights
   }
