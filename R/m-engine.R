@@ -15,14 +15,14 @@ estimate_sub <- function(training, shifted, validation, outcome,
     fit_task   <- initiate_sl3_task(training[i & !dt, ], outcome, node_list[[tau]], outcome_type)
     shift_task <- sw(initiate_sl3_task(shifted[js, ], NULL, node_list[[tau]], NULL))
     valid_task <- sw(initiate_sl3_task(validation[jv, ], NULL, node_list[[tau]], NULL))
-    ensemble   <- initiate_ensemble(outcome_type, check_variation(training[i, ], outcome, learners))
+    ensemble   <- initiate_ensemble(outcome_type, check_variation(training[i, ], outcome, learners[[tau]]))
 
     # progress bar
     pb()
 
     # run SL
     fit <- run_ensemble(ensemble, fit_task)
-    sl_weights[tau, ] <- extract_sl_weights(fit)
+    # sl_weights[tau, ] <- extract_sl_weights(fit)
 
     # predict on shifted data for training
     training[js, pseudo] <- bound(predict_sl3(fit, shift_task))
@@ -73,14 +73,14 @@ estimate_tmle <- function(training, shifted, validation, validation_shifted,
     shift_task   <- sw(initiate_sl3_task(shifted[jt, ], NULL, node_list[[tau]], NULL))
     vnshift_task <- sw(initiate_sl3_task(validation[jv, ], NULL, node_list[[tau]], NULL))
     vshift_task  <- sw(initiate_sl3_task(validation_shifted[jv, ], NULL, node_list[[tau]], NULL))
-    ensemble     <- initiate_ensemble(outcome_type, check_variation(training[i & !dt, ], outcome, learners))
+    ensemble     <- initiate_ensemble(outcome_type, check_variation(training[i & !dt, ], outcome, learners[[tau]]))
 
     # progress bar
     pb()
 
     # run SL
     fit <- run_ensemble(ensemble, fit_task)
-    sl_weights[tau, ] <- extract_sl_weights(fit)
+    # sl_weights[tau, ] <- extract_sl_weights(fit)
 
     # predict on data
     m_natural$train[jt, tau] <- bound(predict_sl3(fit, nshift_task))
@@ -155,11 +155,11 @@ estimate_sdr <- function(training, shifted, validation, validation_shifted,
       shift_task   <- sw(initiate_sl3_task(shifted[jt, ], NULL, node_list[[tau]], NULL))
       vnshift_task <- sw(initiate_sl3_task(validation[jv, ], NULL, node_list[[tau]], NULL))
       vshift_task  <- sw(initiate_sl3_task(validation_shifted[jv, ], NULL, node_list[[tau]], NULL))
-      ensemble     <- initiate_ensemble(outcome_type, check_variation(training[i & !dt, ], outcome, learners))
+      ensemble     <- initiate_ensemble(outcome_type, check_variation(training[i & !dt, ], outcome, learners[[tau]]))
 
       # run SL
       fit <- run_ensemble(ensemble, fit_task)
-      sl_weights[tau, ] <- extract_sl_weights(fit)
+      # sl_weights[tau, ] <- extract_sl_weights(fit)
 
       # predict on training data
       m_natural$train[jt, tau] <- bound(predict_sl3(fit, nshift_task))
@@ -191,7 +191,7 @@ estimate_sdr <- function(training, shifted, validation, validation_shifted,
 
       # run SL
       fit <- run_ensemble(ensemble, fit_task)
-      sl_weights[tau, ] <- extract_sl_weights(fit)
+      # sl_weights[tau, ] <- extract_sl_weights(fit)
 
       # predictions
       m_natural$train[jt, tau] <- bound(predict_sl3(fit, nshift_task))
