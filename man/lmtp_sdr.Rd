@@ -13,7 +13,6 @@ lmtp_sdr(
   cens = NULL,
   k = Inf,
   shift,
-  outcome_type = c("binomial", "continuous"),
   bounds = NULL,
   learners_outcome = NULL,
   learners_trt = NULL,
@@ -43,8 +42,6 @@ used for estimation at the given time point. Default is \code{Inf},
 all time points.}
 
 \item{shift}{A function that specifies how tratment variables should be shifted.}
-
-\item{outcome_type}{Outcome variable type (i.e., continuous, binomial).}
 
 \item{bounds}{An optional vector of the bounds for continuous outcomes. If NULL
 the bounds will be taken as the minimum and maximum of the observed data.

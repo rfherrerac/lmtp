@@ -177,3 +177,10 @@ check_folds <- function(V) {
     stop("The number of folds must be greater than 1.", call. = F)
   }
 }
+
+check_valid_outcome <- function(data, outcome) {
+  if (!(class(data[[outcome]]) %in% c("double", "numeric", "integer"))) {
+    stop("Outcome nodes should either be binary (coded as 0 and 1) or numeric.",
+         call. = F)
+  }
+}

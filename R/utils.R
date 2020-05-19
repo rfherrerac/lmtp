@@ -201,3 +201,18 @@ event_locf <- function(data, outcomes) {
   return(data)
 }
 
+determine_outcome_type <- function(data, outcome, bounds) {
+  check_valid_outcome(data, final_outcome(outcome))
+  if (!is.null(bounds)) {
+    return("continuous")
+  } else {
+    chck <- all(data[[final_outcome(outcome)]] %in% c(0, 1, NA))
+  }
+
+  if (chck) {
+    return("binomial")
+  } else {
+    return("continuous")
+  }
+}
+

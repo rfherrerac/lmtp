@@ -15,7 +15,6 @@
 #'  used for estimation at the given time point. Default is \code{Inf},
 #'  all time points.
 #' @param shift A function that specifies how treatment variables should be shifted.
-#' @param outcome_type Outcome variable type (i.e., continuous, binomial).
 #' @param bounds An optional vector of the bounds for continuous outcomes. If NULL
 #'  the bounds will be taken as the minimum and maximum of the observed data.
 #'  Ignored if outcome type is binary.
@@ -45,7 +44,6 @@
 #' @export
 lmtp_tmle <- function(data, trt, outcome, nodes, baseline = NULL,
                       cens = NULL, k = Inf, shift,
-                      outcome_type = c("binomial", "continuous"),
                       bounds = NULL, learners_outcome = NULL,
                       learners_trt = NULL, folds = 10, bound = 1e-5) {
 
@@ -60,7 +58,7 @@ lmtp_tmle <- function(data, trt, outcome, nodes, baseline = NULL,
     cens = cens,
     k = k,
     shift = shift,
-    outcome_type = match.arg(outcome_type),
+    outcome_type = determine_outcome_type(data, final_outcome(outcome), bounds),
     V = folds,
     bounds = bounds,
     bound = bound,
@@ -122,7 +120,6 @@ lmtp_tmle <- function(data, trt, outcome, nodes, baseline = NULL,
 #'  used for estimation at the given time point. Default is \code{Inf},
 #'  all time points.
 #' @param shift A function that specifies how tratment variables should be shifted.
-#' @param outcome_type Outcome variable type (i.e., continuous, binomial).
 #' @param bounds An optional vector of the bounds for continuous outcomes. If NULL
 #'   the bounds will be taken as the minimum and maximum of the observed data.
 #'   Ignored if outcome type is binary.
@@ -152,7 +149,6 @@ lmtp_tmle <- function(data, trt, outcome, nodes, baseline = NULL,
 #' @example inst/examples/sdr-ex.R
 lmtp_sdr <- function(data, trt, outcome, nodes, baseline = NULL,
                      cens = NULL, k = Inf, shift,
-                     outcome_type = c("binomial", "continuous"),
                      bounds = NULL, learners_outcome = NULL,
                      learners_trt = NULL, folds = 10, bound = 1e-5) {
 
@@ -167,7 +163,7 @@ lmtp_sdr <- function(data, trt, outcome, nodes, baseline = NULL,
     cens = cens,
     k = k,
     shift = shift,
-    outcome_type = match.arg(outcome_type),
+    outcome_type = determine_outcome_type(data, final_outcome(outcome), bounds),
     V = folds,
     bounds = bounds,
     bound = bound,
@@ -226,7 +222,6 @@ lmtp_sdr <- function(data, trt, outcome, nodes, baseline = NULL,
 #'  used for estimation at the given time point. Default is \code{Inf},
 #'  all time points.
 #' @param shift A function that specifies how tratment variables should be shifted.
-#' @param outcome_type Outcome variable type (i.e., continuous, binomial).
 #' @param bounds An optional vector of the bounds for continuous outcomes. If NULL
 #'  the bounds will be taken as the minimum and maximum of the observed data.
 #' @param learners An \code{sl3} learner stack for estimation of the outcome
@@ -251,7 +246,6 @@ lmtp_sdr <- function(data, trt, outcome, nodes, baseline = NULL,
 #' @example inst/examples/sub-ex.R
 lmtp_sub <- function(data, trt, outcome, nodes, baseline = NULL,
                      cens = NULL, k = Inf, shift,
-                     outcome_type = c("binomial", "continuous"),
                      bounds = NULL, learners = NULL, folds = 10, bound = 1e-5) {
 
   # setup -------------------------------------------------------------------
@@ -265,7 +259,7 @@ lmtp_sub <- function(data, trt, outcome, nodes, baseline = NULL,
     cens = cens,
     k = k,
     shift = shift,
-    outcome_type = match.arg(outcome_type),
+    outcome_type = determine_outcome_type(data, final_outcome(outcome), bounds),
     V = folds,
     bounds = bounds,
     bound = bound,
@@ -348,7 +342,7 @@ lmtp_ipw <- function(data, trt, outcome, nodes, baseline = NULL,
     cens = cens,
     k = k,
     shift = shift,
-    outcome_type = NULL,
+    outcome_type = determine_outcome_type(data, final_outcome(outcome), NULL),
     V = folds,
     bounds = NULL,
     bound = bound,

@@ -13,8 +13,7 @@ truth <- 0.76451
 
 # estimators
 sub <-
-  lmtp_sub(df, "A", "Y", nodes, shift = function(x) x + 0.5,
-           outcome_type = "binomial", folds = 2)
+  lmtp_sub(df, "A", "Y", nodes, shift = function(x) x + 0.5, folds = 2)
 
 ipw <-
   lmtp_ipw(df, "A", "Y", nodes, shift = function(x) x + 0.5,
@@ -22,13 +21,11 @@ ipw <-
 
 tmle <-
   lmtp_tmle(df, "A", "Y", nodes, shift = function(x) x + 0.5,
-            outcome_type = "binomial",
             learners_outcome = sl3::make_learner(sl3::Lrnr_glm),
             learners_trt = sl3::make_learner(sl3::Lrnr_glm), folds = 2)
 
 sdr <-
   lmtp_sdr(df, "A", "Y", nodes, shift = function(x) x + 0.5,
-           outcome_type = "binomial",
            learners_outcome = sl3::make_learner(sl3::Lrnr_glm),
            learners_trt = sl3::make_learner(sl3::Lrnr_glm), folds = 2)
 
