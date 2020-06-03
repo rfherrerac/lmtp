@@ -75,7 +75,7 @@ before actually performing the estimation procedure." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">lmtp</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.8.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.91</span>
       </span>
     </div>
 
@@ -98,7 +98,7 @@ before actually performing the estimation procedure." />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/intro-lmtp.html">Using LMTP</a>
+      <a href="../articles/intro-lmtp.html">Getting Started with LMTP</a>
     </li>
   </ul>
 </li>
@@ -130,7 +130,7 @@ it is provided so the analyst can confirm how estimators will use variables
 before actually performing the estimation procedure.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>create_node_list</span>(<span class='no'>trt</span>, <span class='no'>nodes</span>, <span class='kw'>baseline</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>Inf</span>)</pre>
+    <pre class="usage"><span class='fu'>create_node_list</span>(<span class='no'>trt</span>, <span class='no'>tau</span>, <span class='kw'>time_vary</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>baseline</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>Inf</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -140,8 +140,12 @@ before actually performing the estimation procedure.</p>
       <td><p>A vector of column names of treatment variables.</p></td>
     </tr>
     <tr>
-      <th>nodes</th>
-      <td><p>A list of length tau with the column names for new nodes to
+      <th>tau</th>
+      <td><p>The number of time points of observation, excluding the final outcome.</p></td>
+    </tr>
+    <tr>
+      <th>time_vary</th>
+      <td><p>A list of length tau with the column names for new time_vary to
 be introduced at each time point. The list should be ordered following
 the time ordering of the model.</p></td>
     </tr>
@@ -152,7 +156,7 @@ included for adjustment at every timepoint.</p></td>
     </tr>
     <tr>
       <th>k</th>
-      <td><p>An integer specifying how many previous time points should be
+      <td><p>An integer specifying how previous time points should be
 used for estimation at the given time point. Default is <code>Inf</code>,
 all time points.</p></td>
     </tr>
@@ -160,39 +164,71 @@ all time points.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A list the same length of the nodes parameter with the variables
+    <p>A list the same length of the time_vary parameter with the variables
 to be used for estimation at that given time point.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='no'>a</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"A_1"</span>, <span class='st'>"A_2"</span>, <span class='st'>"A_3"</span>, <span class='st'>"A_4"</span>)
 <span class='no'>bs</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"W_1"</span>, <span class='st'>"W_2"</span>)
-<span class='no'>nodes</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"L_1"</span>), <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"L_2"</span>), <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"L_3"</span>), <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"L_4"</span>))
+<span class='no'>time_vary</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"L_1"</span>), <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"L_2"</span>), <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"L_3"</span>), <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"L_4"</span>))
 
 <span class='co'># assuming no Markov property</span>
-<span class='fu'>create_node_list</span>(<span class='no'>a</span>, <span class='no'>nodes</span>, <span class='no'>bs</span>, <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>Inf</span>)</div><div class='output co'>#&gt; [[1]]
+<span class='fu'>create_node_list</span>(<span class='no'>a</span>, <span class='fl'>4</span>, <span class='no'>time_vary</span>, <span class='no'>bs</span>, <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>Inf</span>)</div><div class='output co'>#&gt; $trt
+#&gt; $trt[[1]]
 #&gt; [1] "W_1" "W_2" "L_1" "A_1"
 #&gt; 
-#&gt; [[2]]
+#&gt; $trt[[2]]
+#&gt; [1] "W_1" "W_2" "L_1" "L_2" "A_1" "A_2"
+#&gt; 
+#&gt; $trt[[3]]
+#&gt; [1] "W_1" "W_2" "L_1" "L_2" "A_1" "L_3" "A_2" "A_3"
+#&gt; 
+#&gt; $trt[[4]]
+#&gt;  [1] "W_1" "W_2" "L_1" "L_2" "A_1" "L_3" "A_2" "L_4" "A_3" "A_4"
+#&gt; 
+#&gt; 
+#&gt; $outcome
+#&gt; $outcome[[1]]
+#&gt; [1] "W_1" "W_2" "L_1" "A_1"
+#&gt; 
+#&gt; $outcome[[2]]
 #&gt; [1] "W_1" "W_2" "L_1" "A_1" "L_2" "A_2"
 #&gt; 
-#&gt; [[3]]
+#&gt; $outcome[[3]]
 #&gt; [1] "W_1" "W_2" "L_1" "A_1" "L_2" "A_2" "L_3" "A_3"
 #&gt; 
-#&gt; [[4]]
+#&gt; $outcome[[4]]
 #&gt;  [1] "W_1" "W_2" "L_1" "A_1" "L_2" "A_2" "L_3" "A_3" "L_4" "A_4"
+#&gt; 
 #&gt; </div><div class='input'>
 <span class='co'># assuming a Markov property</span>
-<span class='fu'>create_node_list</span>(<span class='no'>a</span>, <span class='no'>nodes</span>, <span class='no'>bs</span>, <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>1</span>)</div><div class='output co'>#&gt; [[1]]
+<span class='fu'>create_node_list</span>(<span class='no'>a</span>, <span class='fl'>4</span>, <span class='no'>time_vary</span>, <span class='no'>bs</span>, <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>0</span>)</div><div class='output co'>#&gt; $trt
+#&gt; $trt[[1]]
 #&gt; [1] "W_1" "W_2" "L_1" "A_1"
 #&gt; 
-#&gt; [[2]]
-#&gt; [1] "W_1" "W_2" "L_1" "A_1" "L_2" "A_2"
+#&gt; $trt[[2]]
+#&gt; [1] "W_1" "W_2" "L_2" "A_1" "A_2"
 #&gt; 
-#&gt; [[3]]
-#&gt; [1] "W_1" "W_2" "L_2" "A_2" "L_3" "A_3"
+#&gt; $trt[[3]]
+#&gt; [1] "W_1" "W_2" "L_3" "A_2" "A_3"
 #&gt; 
-#&gt; [[4]]
-#&gt; [1] "W_1" "W_2" "L_3" "A_3" "L_4" "A_4"
+#&gt; $trt[[4]]
+#&gt; [1] "W_1" "W_2" "L_4" "A_3" "A_4"
+#&gt; 
+#&gt; 
+#&gt; $outcome
+#&gt; $outcome[[1]]
+#&gt; [1] "W_1" "W_2" "L_1" "A_1"
+#&gt; 
+#&gt; $outcome[[2]]
+#&gt; [1] "W_1" "W_2" "L_2" "A_2"
+#&gt; 
+#&gt; $outcome[[3]]
+#&gt; [1] "W_1" "W_2" "L_3" "A_3"
+#&gt; 
+#&gt; $outcome[[4]]
+#&gt; [1] "W_1" "W_2" "L_4" "A_4"
+#&gt; 
 #&gt; </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

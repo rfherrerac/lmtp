@@ -40,7 +40,9 @@
 
 
 <meta property="og:title" content="LMTP Sequential Doubly Robust Estimator — lmtp_sdr" />
-<meta property="og:description" content="LMTP Sequential Doubly Robust Estimator" />
+<meta property="og:description" content="Sequentially doubly robust estimator for the effects of traditional causal effects and
+modified treatment policies for both point treatment and longitudinal data with binary,
+continuous, or time-to-event outcomes. Supports binary, categorical, and continuous exposures." />
 
 
 
@@ -72,7 +74,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">lmtp</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.8.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.91</span>
       </span>
     </div>
 
@@ -95,7 +97,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/intro-lmtp.html">Using LMTP</a>
+      <a href="../articles/intro-lmtp.html">Getting Started with LMTP</a>
     </li>
   </ul>
 </li>
@@ -121,18 +123,20 @@
     </div>
 
     <div class="ref-description">
-    <p>LMTP Sequential Doubly Robust Estimator</p>
+    <p>Sequentially doubly robust estimator for the effects of traditional causal effects and
+modified treatment policies for both point treatment and longitudinal data with binary,
+continuous, or time-to-event outcomes. Supports binary, categorical, and continuous exposures.</p>
     </div>
 
     <pre class="usage"><span class='fu'>lmtp_sdr</span>(
   <span class='no'>data</span>,
   <span class='no'>trt</span>,
   <span class='no'>outcome</span>,
-  <span class='no'>nodes</span>,
   <span class='kw'>baseline</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>time_vary</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>cens</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>Inf</span>,
   <span class='no'>shift</span>,
+  <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>Inf</span>,
   <span class='kw'>outcome_type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"binomial"</span>, <span class='st'>"continuous"</span>),
   <span class='kw'>bounds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>learners_outcome</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
@@ -146,41 +150,47 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>data</th>
-      <td><p>A data frame.</p></td>
+      <td><p>A data frame in wide format containing all necessary variables
+for the estimation problem.</p></td>
     </tr>
     <tr>
       <th>trt</th>
-      <td><p>A vector of column names of treatment variables.</p></td>
+      <td><p>A vector containing the column names of treatment variables ordered by time.</p></td>
     </tr>
     <tr>
       <th>outcome</th>
-      <td><p>The column name of the outcome variable.</p></td>
-    </tr>
-    <tr>
-      <th>nodes</th>
-      <td><p>A list of length tau with the column names for new nodes to
-be introduced at each time point. The list should be ordered following
-the time ordering of the model.</p></td>
+      <td><p>The column name of the outcome variable. In the case of time-to-event
+analysis, a vector containing the columns names of intermediate outcome variables and the final
+outcome variable ordered by time. Only numeric values are allowed. If the outcome type
+is binary, data should be coded as 0 and 1.</p></td>
     </tr>
     <tr>
       <th>baseline</th>
-      <td><p>An optional vector of columns names for baseline covariates to be
+      <td><p>An optional vector of columns names of baseline covariates to be
 included for adjustment at every timepoint.</p></td>
+    </tr>
+    <tr>
+      <th>time_vary</th>
+      <td><p>A list the same length as the number of time points of observation with
+the column names for new time-varying covariates introduced at each time point. The list
+should be ordered following the time ordering of the model.</p></td>
     </tr>
     <tr>
       <th>cens</th>
       <td><p>An optional vector of column names of censoring indicators the same
-length as <code>A</code>.</p></td>
-    </tr>
-    <tr>
-      <th>k</th>
-      <td><p>An integer specifying how many previous time points nodes should be
-used for estimation at the given time point. Default is <code>Inf</code>,
-all time points.</p></td>
+length as the number of time points of observation. If missingness in the outcome is
+present or if time-to-event outcome, must be provided.</p></td>
     </tr>
     <tr>
       <th>shift</th>
-      <td><p>A function that specifies how tratment variables should be shifted.</p></td>
+      <td><p>A function that specifies how treatment variables should be shifted. See examples
+for how to specify shift functions for continuous, binary, and categorical exposures.</p></td>
+    </tr>
+    <tr>
+      <th>k</th>
+      <td><p>An integer specifying how previous time points should be
+used for estimation at the given time point. Default is <code>Inf</code>,
+all time points.</p></td>
     </tr>
     <tr>
       <th>outcome_type</th>
@@ -188,23 +198,26 @@ all time points.</p></td>
     </tr>
     <tr>
       <th>bounds</th>
-      <td><p>An optional vector of the bounds for continuous outcomes. If NULL
+      <td><p>An optional vector of the bounds for continuous outcomes. If <code>NULL</code>,
 the bounds will be taken as the minimum and maximum of the observed data.
-Ignored if outcome type is binary.</p></td>
+Should be left as <code>NULL</code> if the outcome type is binary.</p></td>
     </tr>
     <tr>
       <th>learners_outcome</th>
       <td><p>An <code>sl3</code> learner stack for estimation of the outcome
-regression.</p></td>
+regression. If not specified, will default to an ensemble of an intercept only model
+and a GLM.</p></td>
     </tr>
     <tr>
       <th>learners_trt</th>
       <td><p>An <code>sl3</code> learner stack for estimation of the exposure
-mechanism.</p></td>
+mechanism. If not specified, will default to an ensemble of an intercept only model
+and a GLM.</p></td>
     </tr>
     <tr>
       <th>folds</th>
-      <td><p>The number of folds to be used for cross-validation.</p></td>
+      <td><p>The number of folds to be used for cross-fitting. Minimum allowable number
+is two folds.</p></td>
     </tr>
     <tr>
       <th>bound</th>
@@ -222,7 +235,7 @@ will be bounded by. The default is 1e-5, bounding predictions by 1e-5 and 0.9999
 <dt>low</dt><dd><p>Lower bound of the 95% confidence interval of the LMTP effect.</p></dd>
 <dt>high</dt><dd><p>Upper bound of the 95% confidene interval of the LMTP effect.</p></dd>
 <dt>eif</dt><dd><p>The estimated, uncentered, influence function of the estimate.</p></dd>
-<dt>shift</dt><dd><p></p></dd>
+<dt>shift</dt><dd><p>The shift function specifying the treatment policy of interest.</p></dd>
 <dt>weights_m</dt><dd><p>A list the same length as <code>folds</code>, containing the Super Learner
 ensemble weights at each time-point for each fold for the outcome regression.</p></dd>
 <dt>weights_r</dt><dd><p>A list the same length as <code>folds</code>, containing the Super Learner
@@ -231,107 +244,145 @@ ensemble weights at each time-point for each fold for the propensity.</p></dd>
 
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>lmtp</span>)
+    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+  <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>lmtp</span>)
+  <span class='co'># Example 1.1</span>
+  <span class='co'># Point treatment, continuous exposure, continuous outcome, no loss-to-follow-up</span>
+  <span class='co'># Interested in the effect of a population wide decrease in A of 5 units</span>
+  <span class='co'># The true value under this intervention is about 519.</span>
+  <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>56</span>)
+  <span class='no'>n</span> <span class='kw'>&lt;-</span> <span class='fl'>1000</span>
+  <span class='no'>W</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='no'>n</span>, <span class='fl'>10</span>, <span class='fl'>5</span>)
+  <span class='no'>A</span> <span class='kw'>&lt;-</span> <span class='fl'>23</span> + <span class='fl'>5</span>*<span class='no'>W</span> + <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='no'>n</span>)
+  <span class='no'>Y</span> <span class='kw'>&lt;-</span> <span class='fl'>7.2</span>*<span class='no'>A</span> + <span class='fl'>3</span>*<span class='no'>W</span> + <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='no'>n</span>)
+  <span class='no'>ex1_dat</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(<span class='no'>W</span>, <span class='no'>A</span>, <span class='no'>Y</span>)
+  <span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>x</span>) <span class='no'>x</span> - <span class='fl'>5</span>
+  <span class='no'>psi1.1</span> <span class='kw'>&lt;-</span> <span class='fu'>lmtp_sdr</span>(<span class='no'>ex1_dat</span>, <span class='st'>"A"</span>, <span class='st'>"Y"</span>, <span class='st'>"W"</span>, <span class='kw'>shift</span> <span class='kw'>=</span> <span class='no'>d</span>,
+                     <span class='kw'>outcome_type</span> <span class='kw'>=</span> <span class='st'>"continuous"</span>, <span class='kw'>folds</span> <span class='kw'>=</span> <span class='fl'>2</span>)
+  <span class='no'>psi1.1</span>
 
-<span class='co'># Example 1.1</span>
-<span class='co'># Point treatment, continuous exposure, continuous outcome, no loss-to-follow-up</span>
-<span class='co'># Interested in the effect of a population wide decrease in A of 5 units</span>
-<span class='co'># The true value under this intervention is about 519.</span>
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>56</span>)
-<span class='no'>n</span> <span class='kw'>&lt;-</span> <span class='fl'>1000</span>
-<span class='no'>W</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='no'>n</span>, <span class='fl'>10</span>, <span class='fl'>5</span>)
-<span class='no'>A</span> <span class='kw'>&lt;-</span> <span class='fl'>23</span> + <span class='fl'>5</span>*<span class='no'>W</span> + <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='no'>n</span>)
-<span class='no'>Y</span> <span class='kw'>&lt;-</span> <span class='fl'>7.2</span>*<span class='no'>A</span> + <span class='fl'>3</span>*<span class='no'>W</span> + <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='no'>n</span>)
-<span class='no'>ex1_dat</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(<span class='no'>W</span>, <span class='no'>A</span>, <span class='no'>Y</span>)
-<span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>x</span>) <span class='no'>x</span> - <span class='fl'>5</span>
-<span class='no'>fit1.1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='lmtp_tmle.html'>lmtp_tmle</a></span>(<span class='no'>ex1_dat</span>, <span class='st'>"A"</span>, <span class='st'>"Y"</span>, <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"W"</span>)), <span class='kw'>shift</span> <span class='kw'>=</span> <span class='no'>d</span>,
-                    <span class='kw'>outcome_type</span> <span class='kw'>=</span> <span class='st'>"continuous"</span>, <span class='kw'>folds</span> <span class='kw'>=</span> <span class='fl'>2</span>)
+  <span class='co'># Example 1.2</span>
+  <span class='co'># Point treatment, continuous exposure, continuous outcome, no loss-to-follow-up</span>
+  <span class='co'># Interesed in the effect of a modified treatment policy where A is decreased by 15</span>
+  <span class='co'># units only among observations whose observed A was above 80.</span>
+  <span class='co'># The true value under this intervention is about 513.</span>
+  <span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>x</span>) (<span class='no'>x</span> <span class='kw'>&gt;</span> <span class='fl'>80</span>)*(<span class='no'>x</span> - <span class='fl'>15</span>) + (<span class='no'>x</span> <span class='kw'>&lt;=</span> <span class='fl'>80</span>)*<span class='no'>x</span>
+  <span class='no'>psi1.2</span> <span class='kw'>&lt;-</span> <span class='fu'>lmtp_sdr</span>(<span class='no'>ex1_dat</span>, <span class='st'>"A"</span>, <span class='st'>"Y"</span>, <span class='st'>"W"</span>, <span class='kw'>shift</span> <span class='kw'>=</span> <span class='no'>d</span>,
+                     <span class='kw'>outcome_type</span> <span class='kw'>=</span> <span class='st'>"continuous"</span>, <span class='kw'>folds</span> <span class='kw'>=</span> <span class='fl'>2</span>)
+  <span class='no'>psi1.2</span>
 
-<span class='co'># Example 1.2</span>
-<span class='co'># Point treatment, continuous exposure, continuous outcome, no loss-to-follow-up</span>
-<span class='co'># Interesed in the effect of a modified treatment policy where A is decreased by 15</span>
-<span class='co'># units only among observations whose observed A was above 80.</span>
-<span class='co'># The true value under this intervention is about 513.</span>
-<span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>x</span>) (<span class='no'>x</span> <span class='kw'>&gt;</span> <span class='fl'>80</span>)*(<span class='no'>x</span> - <span class='fl'>15</span>) + (<span class='no'>x</span> <span class='kw'>&lt;=</span> <span class='fl'>80</span>)*<span class='no'>x</span>
-<span class='no'>fit1.2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='lmtp_tmle.html'>lmtp_tmle</a></span>(<span class='no'>ex1_dat</span>, <span class='st'>"A"</span>, <span class='st'>"Y"</span>, <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"W"</span>)), <span class='kw'>shift</span> <span class='kw'>=</span> <span class='no'>d</span>,
-                    <span class='kw'>outcome_type</span> <span class='kw'>=</span> <span class='st'>"continuous"</span>, <span class='kw'>folds</span> <span class='kw'>=</span> <span class='fl'>2</span>)
-<span class='no'>fit1.2</span></div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='message'><span style='font-weight: bold;'>LMTP Estimator</span><span>: TMLE</span></div><div class='output co'>#&gt;    </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>Trt. Policy</span><span>: </span><span style='color: #0000BB;font-style: italic;'>(d)</span><span></span></div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>Population intervention effect</span><span></span></div><div class='output co'>#&gt;       </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>Estimate</span><span>: 507.768</span></div><div class='output co'>#&gt;     </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>Std. error</span><span>: 4.8914</span></div><div class='output co'>#&gt;         </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>95% CI</span><span>: (498.1811, 517.3549)</span></div><div class='output co'>#&gt; </div><div class='input'>
-<span class='co'># Example 2.1</span>
-<span class='co'># Longitudinal setting, time-varying continuous exposure bounded by 0,</span>
-<span class='co'># time-varying covariates, and a binary outcome with no loss-to-follow-up.</span>
-<span class='co'># Interested in the effect of a treatment policy where exposure decreases by</span>
-<span class='co'># one unit at every time point if an observations observed exposure is greater</span>
-<span class='co'># than or equal to 2. The true value under this intervention is about 0.305.</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>sim_t4</span>)</div><div class='output co'>#&gt;   ID L_1 A_1 L_2 A_2 L_3 A_3 L_4 A_4 Y
-#&gt; 1  1   2   3   0   1   1   1   1   3 0
-#&gt; 2  2   2   1   1   4   0   3   1   2 0
-#&gt; 3  3   1   0   1   3   1   2   1   1 1
-#&gt; 4  4   1   0   0   3   1   3   1   2 0
-#&gt; 5  5   3   3   1   1   0   1   1   2 0
-#&gt; 6  6   1   0   0   2   0   3   1   4 0</div><div class='input'><span class='co'># specifying treament variables</span>
-<span class='no'>a</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"A_1"</span>, <span class='st'>"A_2"</span>, <span class='st'>"A_3"</span>, <span class='st'>"A_4"</span>)
-<span class='co'># specifying time varying covariates</span>
-<span class='no'>time_varying</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"L_1"</span>), <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"L_2"</span>), <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"L_3"</span>), <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"L_4"</span>))
-<span class='co'># treatment policy function to be applied at all time points</span>
-<span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>a</span>) {
-  (<span class='no'>a</span> - <span class='fl'>1</span>) * (<span class='no'>a</span> - <span class='fl'>1</span> <span class='kw'>&gt;=</span> <span class='fl'>1</span>) + <span class='no'>a</span> * (<span class='no'>a</span> - <span class='fl'>1</span> <span class='kw'>&lt;</span> <span class='fl'>1</span>)
-}
-<span class='kw pkg'>progressr</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/progressr/man/with_progress.html'>with_progress</a></span>({
-  <span class='no'>fit2.1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='lmtp_tmle.html'>lmtp_tmle</a></span>(<span class='no'>sim_t4</span>, <span class='no'>a</span>, <span class='st'>"Y"</span>, <span class='no'>time_varying</span>, <span class='kw'>shift</span> <span class='kw'>=</span> <span class='no'>d</span>, <span class='kw'>folds</span> <span class='kw'>=</span> <span class='fl'>2</span>)
-})
-<span class='no'>fit2.1</span></div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>LMTP Estimator</span><span>: TMLE</span></div><div class='output co'>#&gt;    </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>Trt. Policy</span><span>: </span><span style='color: #0000BB;font-style: italic;'>(d)</span><span></span></div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>Population intervention effect</span><span></span></div><div class='output co'>#&gt;       </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>Estimate</span><span>: 0.2644</span></div><div class='output co'>#&gt;     </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>Std. error</span><span>: 0.017</span></div><div class='output co'>#&gt;         </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>95% CI</span><span>: (0.2311, 0.2976)</span></div><div class='output co'>#&gt; </div><div class='input'>
-<span class='co'># Example 2.2</span>
-<span class='co'># Example 2.1 assumed that the outcome (as well as the treatment variables)</span>
-<span class='co'># were directly affected by all other nodes in the past. In certain situtations,</span>
-<span class='co'># domain specific knowledge may suggest otherwise leading to a Markov processes.</span>
-<span class='co'># This can be controlled using the k argument.</span>
-<span class='kw pkg'>progressr</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/progressr/man/with_progress.html'>with_progress</a></span>({
-  <span class='no'>fit2.2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='lmtp_tmle.html'>lmtp_tmle</a></span>(<span class='no'>sim_t4</span>, <span class='no'>a</span>, <span class='st'>"Y"</span>, <span class='no'>time_varying</span>, <span class='kw'>shift</span> <span class='kw'>=</span> <span class='no'>d</span>,
-                      <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>folds</span> <span class='kw'>=</span> <span class='fl'>2</span>)
-})
-<span class='no'>fit2.2</span></div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>LMTP Estimator</span><span>: TMLE</span></div><div class='output co'>#&gt;    </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>Trt. Policy</span><span>: </span><span style='color: #0000BB;font-style: italic;'>(d)</span><span></span></div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>Population intervention effect</span><span></span></div><div class='output co'>#&gt;       </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>Estimate</span><span>: 0.2632</span></div><div class='output co'>#&gt;     </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>Std. error</span><span>: 0.0168</span></div><div class='output co'>#&gt;         </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>95% CI</span><span>: (0.2303, 0.2962)</span></div><div class='output co'>#&gt; </div><div class='input'>
-<span class='co'># Example 3.1</span>
-<span class='co'># Longitudinal setting, time-varying binary treatment, time-varying covariates</span>
-<span class='co'># and baseline covariates with no loss-to-follow-up. Interested in a traditional</span>
-<span class='co'># causal effect where treatment is set to 1 at all time points for all observations.</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='st'>"iptwExWide"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"twang"</span>)
-<span class='no'>a</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span>(<span class='st'>"tx"</span>, <span class='fl'>1</span>:<span class='fl'>3</span>)
-<span class='no'>baseline</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"gender"</span>, <span class='st'>"age"</span>)
-<span class='no'>nodes</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"use0"</span>), <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"use1"</span>), <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"use2"</span>))
-<span class='kw pkg'>progressr</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/progressr/man/with_progress.html'>with_progress</a></span>({
-  <span class='no'>fit3.1</span> <span class='kw'>&lt;-</span>
-    <span class='fu'><a href='lmtp_tmle.html'>lmtp_tmle</a></span>(<span class='no'>iptwExWide</span>, <span class='no'>a</span>, <span class='st'>"outcome"</span>, <span class='no'>nodes</span>, <span class='kw'>baseline</span> <span class='kw'>=</span> <span class='no'>baseline</span>,
-              <span class='kw'>shift</span> <span class='kw'>=</span> <span class='kw'>function</span>(<span class='no'>x</span>) <span class='fl'>1</span>, <span class='kw'>outcome_type</span> <span class='kw'>=</span> <span class='st'>"continuous"</span>,
-              <span class='kw'>folds</span> <span class='kw'>=</span> <span class='fl'>2</span>)
-})
-<span class='no'>fit3.1</span></div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>LMTP Estimator</span><span>: TMLE</span></div><div class='output co'>#&gt;    </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>Trt. Policy</span><span>: </span><span style='color: #0000BB;font-style: italic;'>(function(x) 1)</span><span></span></div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>Population intervention effect</span><span></span></div><div class='output co'>#&gt;       </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>Estimate</span><span>: -0.2866</span></div><div class='output co'>#&gt;     </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>Std. error</span><span>: 0.0419</span></div><div class='output co'>#&gt;         </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>95% CI</span><span>: (-0.3687, -0.2046)</span></div><div class='output co'>#&gt; </div><div class='input'>
-<span class='co'># Example 4.1</span>
-<span class='co'># Longitudinal setting, time-varying continuous treatment, time-varying covariates,</span>
-<span class='co'># binary outcome with right censoring. Interested in the mean population outcome under</span>
-<span class='co'># the observed exposures in a hypothetical population with no loss-to-follow-up.</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>sim_cens</span>)</div><div class='output co'>#&gt;   L1         A1 C1 L2         A2 C2 Y
-#&gt; 1  0  0.7930531  1  0  0.4098544  1 0
-#&gt; 2  1  3.9568969  1  1  7.1306144  1 1
-#&gt; 3  0 -0.9803504  1  0 -2.7858973  1 0
-#&gt; 4  1  0.8833268  1  1  1.1372421  1 1
-#&gt; 5  1  3.1666751  1  1  7.4640462  1 1
-#&gt; 6  1  3.5393771  1  1  9.5161813  1 1</div><div class='input'><span class='no'>a</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"A1"</span>, <span class='st'>"A2"</span>)
-<span class='no'>nodes</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"L1"</span>), <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"L2"</span>))
-<span class='no'>cens</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"C1"</span>, <span class='st'>"C2"</span>)
-<span class='no'>y</span> <span class='kw'>&lt;-</span> <span class='st'>"Y"</span>
-<span class='no'>fit4.1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='lmtp_tmle.html'>lmtp_tmle</a></span>(<span class='no'>sim_cens</span>, <span class='no'>a</span>, <span class='no'>y</span>, <span class='no'>nodes</span>, <span class='kw'>cens</span> <span class='kw'>=</span> <span class='no'>cens</span>, <span class='kw'>shift</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>folds</span> <span class='kw'>=</span> <span class='fl'>2</span>)
-<span class='no'>fit4.1</span></div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>LMTP Estimator</span><span>: TMLE</span></div><div class='output co'>#&gt;    </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>Trt. Policy</span><span>: </span><span style='color: #0000BB;font-style: italic;'>(NULL)</span><span></span></div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>Population intervention effect</span><span></span></div><div class='output co'>#&gt;       </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>Estimate</span><span>: 0.7964</span></div><div class='output co'>#&gt;     </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>Std. error</span><span>: 0.0129</span></div><div class='output co'>#&gt;         </div><div class='output co'>#&gt; <span class='message'></span><span style='font-weight: bold;'>95% CI</span><span>: (0.771, 0.8217)</span></div><div class='output co'>#&gt; </div><div class='input'>
-# Example 4.2
-# Using the same data as example 4.1, but now interested in the causal effect of a
-# modified treatment policy where ...
+  <span class='co'># Example 2.1</span>
+  <span class='co'># Longitudinal setting, time-varying continuous exposure bounded by 0,</span>
+  <span class='co'># time-varying covariates, and a binary outcome with no loss-to-follow-up.</span>
+  <span class='co'># Interested in the effect of a treatment policy where exposure decreases by</span>
+  <span class='co'># one unit at every time point if an observations observed exposure is greater</span>
+  <span class='co'># than or equal to 2. The true value under this intervention is about 0.305.</span>
+  <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>sim_t4</span>)
+  <span class='co'># specifying treament variables</span>
+  <span class='no'>a</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"A_1"</span>, <span class='st'>"A_2"</span>, <span class='st'>"A_3"</span>, <span class='st'>"A_4"</span>)
+  <span class='co'># specifying time varying covariates</span>
+  <span class='no'>tv</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"L_1"</span>), <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"L_2"</span>), <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"L_3"</span>), <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"L_4"</span>))
+  <span class='co'># treatment policy function to be applied at all time points</span>
+  <span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>a</span>) {
+    (<span class='no'>a</span> - <span class='fl'>1</span>) * (<span class='no'>a</span> - <span class='fl'>1</span> <span class='kw'>&gt;=</span> <span class='fl'>1</span>) + <span class='no'>a</span> * (<span class='no'>a</span> - <span class='fl'>1</span> <span class='kw'>&lt;</span> <span class='fl'>1</span>)
+  }
+  <span class='kw pkg'>progressr</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/progressr/man/with_progress.html'>with_progress</a></span>({
+    <span class='no'>psi2.1</span> <span class='kw'>&lt;-</span> <span class='fu'>lmtp_sdr</span>(<span class='no'>sim_t4</span>, <span class='no'>a</span>, <span class='st'>"Y"</span>, <span class='kw'>time_vary</span> <span class='kw'>=</span> <span class='no'>tv</span>, <span class='kw'>shift</span> <span class='kw'>=</span> <span class='no'>d</span>, <span class='kw'>folds</span> <span class='kw'>=</span> <span class='fl'>2</span>)
+  })
+  <span class='no'>psi2.1</span>
 
-# Example 5.1
-# Time-to-event analysis with a time-invariant exposure.
+  <span class='co'># Example 2.2</span>
+  <span class='co'># Example 2.1 assumed that the outcome (as well as the treatment variables)</span>
+  <span class='co'># were directly affected by all other nodes in the past. In certain situtations,</span>
+  <span class='co'># domain specific knowledge may suggest otherwise leading to a Markov processes.</span>
+  <span class='co'># This can be controlled using the k argument.</span>
+  <span class='kw pkg'>progressr</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/progressr/man/with_progress.html'>with_progress</a></span>({
+    <span class='no'>psi2.2</span> <span class='kw'>&lt;-</span> <span class='fu'>lmtp_sdr</span>(<span class='no'>sim_t4</span>, <span class='no'>a</span>, <span class='st'>"Y"</span>, <span class='kw'>time_vary</span> <span class='kw'>=</span> <span class='no'>tv</span>, <span class='kw'>shift</span> <span class='kw'>=</span> <span class='no'>d</span>,
+                       <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>folds</span> <span class='kw'>=</span> <span class='fl'>2</span>)
+  })
+  <span class='no'>psi2.2</span>
 
-# Example 5.2
-# Time-to-event analysis with a time-varying exposure and time-varying covariates.
+  <span class='co'># Example 2.3</span>
+  <span class='co'># Using the same data as examples 2.1 and 2.3, but now treating the exposure</span>
+  <span class='co'># as an ordered categorical variable. To account for the exposure being a</span>
+  <span class='co'># factor we just need to modify the shift function (and the original data)</span>
+  <span class='co'># so as to respect this.</span>
+  <span class='kw'>for</span> (<span class='no'>i</span> <span class='kw'>in</span> <span class='no'>a</span>) {
+    <span class='no'>sim_t4</span><span class='kw'>[[</span><span class='no'>i</span>]] <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>factor</a></span>(<span class='no'>sim_t4</span><span class='kw'>[[</span><span class='no'>i</span>]], <span class='kw'>levels</span> <span class='kw'>=</span> <span class='fl'>0</span>:<span class='fl'>5</span>, <span class='kw'>ordered</span> <span class='kw'>=</span> <span class='no'>T</span>)
+  }
 
-</div></span></pre>
+  <span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>a</span>) {
+    <span class='no'>out</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>()
+    <span class='kw'>for</span> (<span class='no'>i</span> <span class='kw'>in</span> <span class='fl'>1</span>:<span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>a</span>)) {
+      <span class='kw'>if</span> (<span class='fu'><a href='https://rdrr.io/r/base/character.html'>as.character</a></span>(<span class='no'>a</span>[<span class='no'>i</span>]) <span class='kw'>%in%</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"0"</span>, <span class='st'>"1"</span>)) {
+        <span class='no'>out</span><span class='kw'>[[</span><span class='no'>i</span>]] <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>as.character</a></span>(<span class='no'>a</span>[<span class='no'>i</span>])
+      } <span class='kw'>else</span> {
+        <span class='no'>out</span><span class='kw'>[[</span><span class='no'>i</span>]] <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/numeric.html'>as.numeric</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/character.html'>as.character</a></span>(<span class='no'>a</span>[<span class='no'>i</span>])) - <span class='fl'>1</span>
+      }
+    }
+    <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>factor</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/unlist.html'>unlist</a></span>(<span class='no'>out</span>), <span class='kw'>levels</span> <span class='kw'>=</span> <span class='fl'>0</span>:<span class='fl'>5</span>, <span class='kw'>ordered</span> <span class='kw'>=</span> <span class='no'>T</span>)
+  }
+
+  <span class='kw pkg'>progressr</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/progressr/man/with_progress.html'>with_progress</a></span>({
+    <span class='no'>psi2.3</span> <span class='kw'>&lt;-</span> <span class='fu'>lmtp_sdr</span>(<span class='no'>sim_t4</span>, <span class='no'>a</span>, <span class='st'>"Y"</span>, <span class='kw'>time_vary</span> <span class='kw'>=</span> <span class='no'>tv</span>, <span class='kw'>shift</span> <span class='kw'>=</span> <span class='no'>d</span>, <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>folds</span> <span class='kw'>=</span> <span class='fl'>2</span>)
+  })
+  <span class='no'>psi2.3</span>
+
+  <span class='co'># Example 3.1</span>
+  <span class='co'># Longitudinal setting, time-varying binary treatment, time-varying covariates</span>
+  <span class='co'># and baseline covariates with no loss-to-follow-up. Interested in a traditional</span>
+  <span class='co'># causal effect where treatment is set to 1 at all time points for all observations.</span>
+  <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='st'>"iptwExWide"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"twang"</span>)
+  <span class='no'>a</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span>(<span class='st'>"tx"</span>, <span class='fl'>1</span>:<span class='fl'>3</span>)
+  <span class='no'>baseline</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"gender"</span>, <span class='st'>"age"</span>)
+  <span class='no'>tv</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"use0"</span>), <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"use1"</span>), <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"use2"</span>))
+  <span class='kw pkg'>progressr</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/progressr/man/with_progress.html'>with_progress</a></span>({
+    <span class='no'>psi3.1</span> <span class='kw'>&lt;-</span>
+      <span class='fu'>lmtp_sdr</span>(<span class='no'>iptwExWide</span>, <span class='no'>a</span>, <span class='st'>"outcome"</span>, <span class='kw'>baseline</span> <span class='kw'>=</span> <span class='no'>baseline</span>, <span class='kw'>time_vary</span> <span class='kw'>=</span> <span class='no'>tv</span>,
+               <span class='kw'>shift</span> <span class='kw'>=</span> <span class='kw'>function</span>(<span class='no'>x</span>) <span class='fl'>1</span>, <span class='kw'>outcome_type</span> <span class='kw'>=</span> <span class='st'>"continuous"</span>,
+               <span class='kw'>folds</span> <span class='kw'>=</span> <span class='fl'>2</span>)
+  })
+  <span class='no'>psi3.1</span>
+
+  <span class='co'># Example 4.1</span>
+  <span class='co'># Longitudinal setting, time-varying continuous treatment, time-varying covariates,</span>
+  <span class='co'># binary outcome with right censoring. Interested in the mean population outcome under</span>
+  <span class='co'># the observed exposures in a hypothetical population with no loss-to-follow-up.</span>
+  <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>sim_cens</span>)
+  <span class='no'>a</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"A1"</span>, <span class='st'>"A2"</span>)
+  <span class='no'>tv</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"L1"</span>), <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"L2"</span>))
+  <span class='no'>cens</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"C1"</span>, <span class='st'>"C2"</span>)
+  <span class='no'>y</span> <span class='kw'>&lt;-</span> <span class='st'>"Y"</span>
+  <span class='no'>psi4.1</span> <span class='kw'>&lt;-</span> <span class='fu'>lmtp_sdr</span>(<span class='no'>sim_cens</span>, <span class='no'>a</span>, <span class='no'>y</span>, <span class='kw'>time_vary</span> <span class='kw'>=</span> <span class='no'>tv</span>, <span class='kw'>cens</span> <span class='kw'>=</span> <span class='no'>cens</span>,
+                     <span class='kw'>shift</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>folds</span> <span class='kw'>=</span> <span class='fl'>2</span>)
+  <span class='no'>psi4.1</span>
+
+  <span class='co'># Example 4.2</span>
+  <span class='co'># Using the same data as example 4.1, but now interested in the causal effect of a</span>
+  <span class='co'># treatment policy where exposure increased by 0.5 units at all time points. The</span>
+  <span class='co'># true value under this intervention is about 0.88.</span>
+  <span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>x</span>) <span class='no'>x</span> + <span class='fl'>0.5</span>
+  <span class='no'>psi4.2</span> <span class='kw'>&lt;-</span> <span class='fu'>lmtp_sdr</span>(<span class='no'>sim_cens</span>, <span class='no'>a</span>, <span class='no'>y</span>, <span class='kw'>time_vary</span> <span class='kw'>=</span> <span class='no'>tv</span>,
+                     <span class='kw'>cens</span> <span class='kw'>=</span> <span class='no'>cens</span>, <span class='kw'>shift</span> <span class='kw'>=</span> <span class='no'>d</span>, <span class='kw'>folds</span> <span class='kw'>=</span> <span class='fl'>2</span>)
+  <span class='no'>psi4.2</span>
+
+  <span class='co'># Example 5.1</span>
+  <span class='co'># Time-to-event analysis with a binary time-invariant exposure. Interested in</span>
+  <span class='co'># the effect of treatment being given to all observations on the cumulative</span>
+  <span class='co'># incidence of our time-to-event outcome.</span>
+  <span class='no'>a</span> <span class='kw'>&lt;-</span> <span class='st'>"trt"</span>
+  <span class='co'># for a survival problem, the outcome arugment now takes a vector of outcomes</span>
+  <span class='co'># if an observation experiences the event prior to the end of follow-up, all future</span>
+  <span class='co'># outcome nodes should be set to 1 (i.e., last observation carried forward).</span>
+  <span class='no'>y</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span>(<span class='st'>"Y."</span>, <span class='fl'>0</span>:<span class='fl'>6</span>)
+  <span class='no'>cens</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span>(<span class='st'>"C."</span>, <span class='fl'>0</span>:<span class='fl'>5</span>)
+  <span class='no'>baseline</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"W1"</span>, <span class='st'>"W2"</span>)
+  <span class='kw pkg'>progressr</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/progressr/man/with_progress.html'>with_progress</a></span>({
+    <span class='no'>psi5.1</span> <span class='kw'>&lt;-</span> <span class='fu'>lmtp_sdr</span>(<span class='no'>sim_point_surv</span>, <span class='no'>a</span>, <span class='no'>y</span>, <span class='no'>baseline</span>, <span class='kw'>cens</span> <span class='kw'>=</span> <span class='no'>cens</span>,
+                       <span class='kw'>shift</span> <span class='kw'>=</span> <span class='kw'>function</span>(<span class='no'>x</span>) <span class='fl'>1</span>, <span class='kw'>folds</span> <span class='kw'>=</span> <span class='fl'>2</span>)
+  })
+  <span class='no'>psi5.1</span>
+}</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

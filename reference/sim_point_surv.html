@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Simulated Longitudinal Data — sim_t4 • lmtp</title>
+<title>Simulated Point-treatment Survival Data — sim_point_surv • lmtp</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,9 @@
 
 
 
-<meta property="og:title" content="Simulated Longitudinal Data — sim_t4" />
-<meta property="og:description" content="A dataset with a binary outcome, four time varying treatment nodes,
-and four time varying covariates." />
+<meta property="og:title" content="Simulated Point-treatment Survival Data — sim_point_surv" />
+<meta property="og:description" content="A dataset with a time-to-event outcome, two baseline nodes, a binary
+point treatment, six past-time outcome nodes, and six censoring indicators." />
 
 
 
@@ -116,32 +116,38 @@ and four time varying covariates." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Simulated Longitudinal Data</h1>
+    <h1>Simulated Point-treatment Survival Data</h1>
     
-    <div class="hidden name"><code>sim_t4.Rd</code></div>
+    <div class="hidden name"><code>sim_point_surv.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>A dataset with a binary outcome, four time varying treatment nodes,
-and four time varying covariates.</p>
+    <p>A dataset with a time-to-event outcome, two baseline nodes, a binary
+point treatment, six past-time outcome nodes, and six censoring indicators.</p>
     </div>
 
-    <pre class="usage"><span class='no'>sim_t4</span></pre>
+    <pre class="usage"><span class='no'>sim_point_surv</span></pre>
 
 
     <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
 
-    <p>A data frame with 5000 rows and 10 variables:</p><dl>
-<dt>ID</dt><dd><p>observation ID</p></dd>
-<dt>L_1</dt><dd><p>Time varying covariate time 1</p></dd>
-<dt>A_1</dt><dd><p>Treatment node at time 1, effected by L_1</p></dd>
-<dt>L_2</dt><dd><p>Time varying covariate time 1, effected by L_1 and A_1</p></dd>
-<dt>A_2</dt><dd><p>Treatment node at time 2, effected by L_2 and A_1</p></dd>
-<dt>L_3</dt><dd><p>Time varying covariate time 1, effected by L_2 and A_2</p></dd>
-<dt>A_3</dt><dd><p>Treatment node at time 3, effected by L_3 and A_2</p></dd>
-<dt>L_4</dt><dd><p>Time varying covariate time 1, effected by L_3 and A_3</p></dd>
-<dt>A_4</dt><dd><p>Treatment node at time 3, effected by L_4 and A_3</p></dd>
-<dt>Y</dt><dd><p>Binary outcome at time 5, effected by L_4 and A_4</p></dd>
+    <p>A data frame with 2000 rows and 16 variables:</p><dl>
+<dt>W1</dt><dd><p>Binary baseline variable.</p></dd>
+<dt>W2</dt><dd><p>Categorical baseline variable.</p></dd>
+<dt>trt</dt><dd><p>Binary treatment variable.</p></dd>
+<dt>Y.0</dt><dd><p>Outcome node at time 0.</p></dd>
+<dt>C.0</dt><dd><p>Censoring indicator that the observation is observed future time points.</p></dd>
+<dt>Y.1</dt><dd><p>Outcome node at time 1.</p></dd>
+<dt>C.1</dt><dd><p>Censoring indicator that the observation is observed future time points.</p></dd>
+<dt>Y.2</dt><dd><p>Outcome node at time 2.</p></dd>
+<dt>C.2</dt><dd><p>Censoring indicator that the observation is observed future time points.</p></dd>
+<dt>Y.3</dt><dd><p>Outcome node at time 3.</p></dd>
+<dt>C.3</dt><dd><p>Censoring indicator that the observation is observed future time points.</p></dd>
+<dt>Y.4</dt><dd><p>Outcome node at time 4.</p></dd>
+<dt>C.4</dt><dd><p>Censoring indicator that the observation is observed future time points.</p></dd>
+<dt>Y.5</dt><dd><p>Outcome node at time 5.</p></dd>
+<dt>C.5</dt><dd><p>Censoring indicator that the observation is observed future time points.</p></dd>
+<dt>Y.6</dt><dd><p>Final outcome node.</p></dd>
 
 </dl>
 
